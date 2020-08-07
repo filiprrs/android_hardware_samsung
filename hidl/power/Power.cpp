@@ -105,8 +105,7 @@ Return<void> Power::powerHint(PowerHint hint, int32_t data) {
     }
 
     /* Bail out if low-power mode is active */
-    if (current_profile == PowerProfile::POWER_SAVE && hint != PowerHint::LOW_POWER &&
-        hint != static_cast<PowerHint>(LineagePowerHint::SET_PROFILE)) {
+    if (current_profile == PowerProfile::POWER_SAVE && hint != PowerHint::LOW_POWER) {
         LOG(VERBOSE) << "PROFILE_POWER_SAVE active, ignoring hint " << static_cast<int32_t>(hint);
         return Void();
     }
@@ -120,13 +119,6 @@ Return<void> Power::powerHint(PowerHint hint, int32_t data) {
             setProfile(data ? PowerProfile::POWER_SAVE : PowerProfile::BALANCED);
             break;
         default:
-            if (hint == static_cast<PowerHint>(LineagePowerHint::SET_PROFILE)) {
-                setProfile(static_cast<PowerProfile>(data));
-            } else if (hint == static_cast<PowerHint>(LineagePowerHint::CPU_BOOST)) {
-                sendBoost(data);
-            } else {
-                LOG(INFO) << "Unknown power hint: " << static_cast<int32_t>(hint);
-            }
             break;
     }
     return Void();
@@ -149,15 +141,6 @@ Return<void> Power::setFeature(Feature feature __unused, bool activate __unused)
 Return<void> Power::getPlatformLowPowerStats(getPlatformLowPowerStats_cb _hidl_cb) {
     _hidl_cb({}, Status::SUCCESS);
     return Void();
-}
-
-Return<int32_t> Power::getFeature(LineageFeature feature) {
-    switch (feature) {
-        case LineageFeature::SUPPORTED_PROFILES:
-            return static_cast<int32_t>(PowerProfile::MAX);
-        default:
-            return -1;
-    }
 }
 
 void Power::initialize() {
