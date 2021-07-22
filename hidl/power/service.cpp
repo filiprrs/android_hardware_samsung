@@ -33,7 +33,7 @@ using android::sp;
 using android::status_t;
 
 int main() {
-    sp<Power> power;
+    sp<Power> power = new Power();
     status_t status = 0;
 
     configureRpcThreadpool(1, true);
@@ -41,6 +41,12 @@ int main() {
     status = power->IPower::registerAsService();
     if (status != OK) {
         LOG(ERROR) << "Could not register service (IPower) for Power HAL";
+        goto shutdown;
+    }
+
+    status = power->ILineagePower::registerAsService();
+    if (status != OK) {
+        LOG(ERROR) << "Could not register service (ILineagePower) for Power HAL";
         goto shutdown;
     }
 
